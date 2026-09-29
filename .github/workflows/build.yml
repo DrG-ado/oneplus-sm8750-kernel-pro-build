@@ -190,7 +190,7 @@ jobs:
           TOOLCHAIN_ARCHIVE="$GITHUB_WORKSPACE/work/_tmp/clang-r563880c.tar.gz"
           mkdir -p "$(dirname "$TOOLCHAIN_ARCHIVE")"
          gh release download toolchain-AOSP-Clang-21.0.0-r563880c \
-  -p clang-r563880c.tar.gz -R "GuLingguang/oneplus-sm8750-kernel-pro-build" -D "$(dirname "$TOOLCHAIN_ARCHIVE")"
+          gh release download toolchain-AOSP-Clang-21.0.0-r563880c -p clang-r563880c.tar.gz -R "GuLingguang/oneplus-sm8750-kernel-pro-build" -D "$(dirname "$TOOLCHAIN_ARCHIVE")"
           python3 scripts/build.py --workflow --verify-toolchain "$TOOLCHAIN_ARCHIVE"
           mkdir -p clang
           tar xzf "$TOOLCHAIN_ARCHIVE" -C clang
