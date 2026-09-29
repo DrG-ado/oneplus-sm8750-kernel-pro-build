@@ -7,23 +7,23 @@ on:
         description: 'KernelSU variant (resukisu or none)'
         required: true
         type: choice
-        default: 'none'
+        default: 'resukisu'
         options: ['resukisu', 'none']
       susfs_enable:
         description: 'SUSFS mount/root hiding (requires KernelSU)'
         required: true
         type: boolean
-        default: false
+        default: true
       lz4_zstd:
         description: 'Use the locked LZ4 1.10.0 and zstd 1.5.7 kernel sources'
         required: true
         type: boolean
-        default: false
+        default: true
       lz4kd_enable:
         description: 'Enable the locked LZ4KD zram compressor'
         required: true
         type: boolean
-        default: false
+        default: true
       show_all_algos:
         description: 'Enable all zram compressor backends'
         required: true
@@ -33,7 +33,7 @@ on:
         description: 'Enable zram writeback (runtime backing_dev setup is separate)'
         required: true
         type: boolean
-        default: false
+        default: true
       droidspaces:
         description: 'Droidspaces mode'
         required: true
@@ -187,19 +187,19 @@ jobs:
           set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y zip zstd patch bc flex bison libssl-dev libncurses-dev libelf-dev libdw-dev zlib1g-dev libzstd-dev liblzma-dev libbz2-dev dwarves python3 ccache mkbootimg cmake ninja-build
-          TOOLCHAIN_ARCHIVE="$GITHUB_WORKSPACE/work/_tmp/clang-r563880c.tar.gz"
+          TOOLCHAIN_ARCHIVE="$GITHUB_WORKSPACE/_tmp/clang-r563880c.tar.gz"
           mkdir -p "$(dirname "$TOOLCHAIN_ARCHIVE")"
                   gh release download toolchain-AOSP-Clang-21.0.0-r563880c -p clang-r563880c.tar.gz -R "$GITHUB_REPOSITORY" -D "$(dirname "$TOOLCHAIN_ARCHIVE")"
           python3 scripts/build.py --workflow --verify-toolchain "$TOOLCHAIN_ARCHIVE"
           mkdir -p clang
           tar xzf "$TOOLCHAIN_ARCHIVE" -C clang
           echo "$PWD/clang/bin" >> "$GITHUB_PATH"
-          mkdir -p "$GITHUB_WORKSPACE/work/_tmp/gki"
-          python3 - <<'PY' >"$GITHUB_WORKSPACE/work/_tmp/gki/generate_gki_certificate.py"
+          mkdir -p "$GITHUB_WORKSPACE/_tmp/gki"
+          python3 - <<'PY' >"$GITHUB_WORKSPACE/_tmp/gki/generate_gki_certificate.py"
           print('def generate_gki_certificate(*args, **kwargs):')
           print('    raise SystemExit("GKI signing is not enabled by this workflow")')
           PY
-          echo "PYTHONPATH=$GITHUB_WORKSPACE/work/_tmp" >> "$GITHUB_ENV"
+          echo "PYTHONPATH=$GITHUB_WORKSPACE/_tmp" >> "$GITHUB_ENV"
 
       - name: Build the pinned pahole
         run: |
@@ -257,6 +257,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo sysctl -w vm.max_map_count=1048576
+          rm -rf "$GITHUB_WORKSPACE/work"
           python3 scripts/build.py --workflow
 
       - name: Save ccache
